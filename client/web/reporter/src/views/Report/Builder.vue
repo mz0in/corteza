@@ -378,7 +378,7 @@
 
 <script>
 import { cloneDeep } from 'lodash'
-import { system, reporter } from '@cortezaproject/corteza-js'
+import { system, reporter, NoID } from '@cortezaproject/corteza-js'
 import report from 'corteza-webapp-reporter/src/mixins/report'
 import Grid from 'corteza-webapp-reporter/src/components/Report/Grid'
 import Block from 'corteza-webapp-reporter/src/components/Report/Blocks'
@@ -651,8 +651,13 @@ export default {
       return this.datasources.processing || hasDuplicates
     },
 
+<<<<<<< HEAD
     showEditor () {
       return this.editor && this.editor.currentIndex !== undefined
+=======
+    onRecordPage () {
+      return this.page && this.page.moduleID !== NoID
+>>>>>>> 84bc8eef2 (extend filter fields functionality)
     },
   },
 

@@ -263,6 +263,8 @@
           </b-row>
 
           <prefilter
+            :on-record-page="onRecordPage"
+            :record="record"
             :module="recordListModule"
             :namespace="namespace"
             :options="options"

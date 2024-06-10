@@ -17,10 +17,15 @@
             label-class="text-primary"
           >
             <b-input-group>
-              <b-form-input
+              <c-input-expressions
                 id="title"
                 v-model="block.title"
+                auto-complete
+                lang="javascript"
                 :placeholder="$t('general.titlePlaceholder')"
+                :suggestion-tree="autoCompleteSuggestionTree"
+                height="37.59px"
+                class="flex-grow-1"
               />
 
               <b-input-group-append>
@@ -53,10 +58,15 @@
             label-class="text-primary"
           >
             <b-input-group>
-              <b-form-textarea
+              <c-input-expressions
                 id="description"
                 v-model="block.description"
+                auto-complete
+                lang="javascript"
                 :placeholder="$t('general.descriptionPlaceholder')"
+                :suggestion-tree="autoCompleteSuggestionTree"
+                height="55.16px"
+                class="flex-grow-1"
               />
               <b-input-group-append>
                 <page-translator
@@ -257,9 +267,15 @@
                   ƒ
                 </b-button>
               </b-input-group-prepend>
-              <b-form-input
+              <c-input-expressions
+                id="visibility-fields"
                 v-model="block.meta.visibility.expression"
+                auto-complete
+                lang="javascript"
                 :placeholder="$t('general.visibility.condition.placeholder')"
+                :suggestion-tree="visibilityAutoSuggestionTree"
+                height="37.59px"
+                class="flex-grow-1"
               />
               <b-input-group-append>
                 <b-button
@@ -344,9 +360,12 @@
 </template>
 <script>
 import { compose, NoID } from '@cortezaproject/corteza-js'
-import { handle } from '@cortezaproject/corteza-vue'
+import { handle, components } from '@cortezaproject/corteza-vue'
+import { getRecordBasedSuggestions, getVisibilityConditionBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
 import PageTranslator from 'corteza-webapp-compose/src/components/Admin/Page/PageTranslator'
 import PageBlock from './index'
+
+const { CInputExpressions } = components
 
 export default {
   i18nOptions: {
@@ -356,6 +375,7 @@ export default {
   components: {
     PageBlock,
     PageTranslator,
+    CInputExpressions,
   },
 
   props: {
@@ -364,9 +384,21 @@ export default {
       required: true,
     },
 
+    module: {
+      type: compose.Module,
+      required: false,
+      default: undefined,
+    },
+
     page: {
       type: compose.Page,
       required: true,
+    },
+
+    record: {
+      type: [Object, null],
+      required: false,
+      default: null,
     },
   },
 
@@ -444,6 +476,24 @@ export default {
       set (roles) {
         this.$set(this.block.meta.visibility, 'roles', roles)
       },
+    },
+
+    autoCompleteSuggestionTree () {
+      const moduleFields = (this.module.fields || []).map(({ name }) => name)
+      const userProperties = this.$auth.user.properties()
+      const recordProperties = this.record ? this.record.properties() : undefined
+      const recordValueFields = this.record ? Object.keys(this.record.values) : undefined
+
+      return getRecordBasedSuggestions({ moduleFields, userProperties, recordProperties, isRecordPage: this.isRecordPage, recordValueFields })
+    },
+
+    visibilityAutoSuggestionTree () {
+      const moduleFields = (this.module.fields || []).map(({ name }) => name)
+      const userProperties = this.$auth.user.properties()
+      const recordProperties = this.record ? this.record.properties() : undefined
+      const recordValueFields = this.record ? Object.keys(this.record.values) : undefined
+
+      return getVisibilityConditionBasedSuggestions({ moduleFields, userProperties, recordProperties, isRecordPage: this.isRecordPage, recordValueFields })
     },
   },
 
