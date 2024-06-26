@@ -13,13 +13,16 @@
 
     <div
       v-else-if="module"
-      class="mt-3 px-3"
+      ref="fieldContainer"
+      class="mt-3"
+      :class="fieldLayoutClass"
     >
       <template v-for="field in fields">
         <div
           v-if="canDisplay(field)"
           :key="field.id"
-          class="field-container mb-3"
+          :class="columnWrapClass"
+          :style="fieldWidth"
         >
           <field-editor
             v-if="isFieldEditable(field)"
@@ -40,7 +43,9 @@
               <div
                 class="d-flex align-items-center text-primary mb-0"
               >
-                <span class="d-inline-block mw-100">
+                <span
+                  class="d-flex"
+                >
                   {{ field.label || field.name }}
                 </span>
 
@@ -88,6 +93,7 @@ import records from 'corteza-webapp-compose/src/mixins/records'
 import FieldEditor from 'corteza-webapp-compose/src/components/ModuleFields/Editor'
 import FieldViewer from 'corteza-webapp-compose/src/components/ModuleFields/Viewer'
 import conditionalFields from 'corteza-webapp-compose/src/mixins/conditionalFields'
+import recordLayout from 'corteza-webapp-compose/src/mixins/recordLayout'
 import { debounce } from 'lodash'
 
 export default {
@@ -106,6 +112,7 @@ export default {
     users,
     records,
     conditionalFields,
+    recordLayout,
   ],
 
   props: {
@@ -135,6 +142,24 @@ export default {
       })
     },
 
+    fieldLayoutClass () {
+      const classes = {
+        default: 'd-flex flex-column',
+        noWrap: 'd-flex gap-2',
+        wrap: 'row no-gutters',
+      }
+
+      return classes[this.options.recordFieldLayoutOption]
+    },
+
+    fieldWidth () {
+      if (this.options.recordFieldLayoutOption !== 'noWrap') {
+        return {}
+      }
+
+      return { 'min-width': '13rem' }
+    },
+
     errorID () {
       const { recordID = NoID } = this.record || {}
       return recordID === NoID ? 'parent:0' : recordID
@@ -145,7 +170,7 @@ export default {
     },
 
     horizontal () {
-      return this.block.options.horizontalFieldLayoutEnabled
+      return this.block.options.horizontalFieldLayoutEnabled && this.options.recordFieldLayoutOption !== 'noWrap'
     },
   },
 
@@ -176,6 +201,25 @@ export default {
         })
       },
     },
+
+    processing: {
+      handler (newVal) {
+        if (this.options.recordFieldLayoutOption !== 'wrap') return
+
+        if (!newVal && this.module) {
+          this.$nextTick(() => {
+            this.initializeResizeObserver(this.$refs.fieldContainer)
+          })
+        } else if (this.resizeObserver) {
+          this.resizeObserver.unobserve(this.$refs.fieldContainer)
+          this.columnWrapClass = ''
+        }
+      },
+    },
+  },
+
+  beforeDestroy () {
+    this.destroyEvents(this.$refs.fieldContainer)
   },
 
   methods: {
@@ -225,3 +269,10 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.field-col > * {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+</style>

@@ -16,7 +16,7 @@
       >
         <span
           :title="label"
-          class="d-inline-block mw-100"
+          class="d-flex"
         >
           {{ label }}
         </span>
@@ -25,6 +25,7 @@
 
         <slot name="tools" />
       </div>
+
       <div
         class="small text-muted"
         :class="{ 'mb-1': description }"

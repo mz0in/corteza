@@ -90,6 +90,23 @@
             />
           </b-form-group>
         </b-col>
+
+        <b-col
+          cols="12"
+          lg="6"
+        >
+          <b-form-group
+            :label="$t('record.fieldsLayoutMode.label')"
+            label-class="text-primary"
+          >
+            <c-input-select
+              v-model="options.recordFieldLayoutOption"
+              :options="recordFieldLayoutOptions"
+              :reduce="option => option.value"
+              :get-option-key="option => option.label"
+            />
+          </b-form-group>
+        </b-col>
       </b-row>
     </div>
 
@@ -258,6 +275,14 @@ export default {
         { value: 'sameTab', text: this.$t('record.openInSameTab') },
         { value: 'newTab', text: this.$t('record.openInNewTab') },
         { value: 'modal', text: this.$t('record.openInModal') },
+      ]
+    },
+
+    recordFieldLayoutOptions () {
+      return [
+        { value: 'default', label: this.$t('record.fieldsLayoutMode.default') },
+        { value: 'noWrap', label: this.$t('record.fieldsLayoutMode.noWrap') },
+        { value: 'wrap', label: this.$t('record.fieldsLayoutMode.wrap') },
       ]
     },
 
