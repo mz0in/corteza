@@ -35,7 +35,6 @@
         :label="$t('chart.drillDown.label')"
         :description="$t('chart.drillDown.description')"
         label-class="d-flex align-items-center text-primary"
-        class="mb-1"
       >
         <template #label>
           {{ $t('chart.drillDown.label') }}
@@ -75,6 +74,17 @@
         </b-input-group>
       </b-form-group>
     </template>
+
+    <b-form-group
+      label="Enable live filter"
+      label-class="text-primary"
+    >
+      <c-input-checkbox
+        v-model="options.liveFilterEnabled"
+        switch
+        :labels="checkboxLabel"
+      />
+    </b-form-group>
   </b-tab>
 </template>
 <script>

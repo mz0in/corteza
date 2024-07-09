@@ -4,6 +4,60 @@
     v-on="$listeners"
     @refreshBlock="refresh"
   >
+    <template>
+      <b-button
+        rounded="full"
+        variant="outline-light"
+        class="chart__livefilter-btn text-secondary d-print-none"
+        @click="liveFilterModal.show = true"
+      >
+        <font-awesome-icon
+          :icon="['fas', 'filter']"
+        />
+      </b-button>
+
+      <b-modal
+        v-model="liveFilterModal.show"
+        :title="liveFilterModal.title"
+        :ok-title="$t('general:label.saveAndClose')"
+        centered
+        size="md"
+        cancel-variant="light"
+        no-fade
+        @ok="liveFilterUpdate()"
+        @cancel="liveFilterModal.show = undefined"
+        @hide="liveFilterModal.show = undefined"
+      >
+        <b-form-group
+          :label="$t('chart:edit.filter.preset')"
+          label-class="text-primary"
+        >
+          <c-input-select
+            v-model="liveFilterValue"
+            :options="predefinedFilters"
+            label="text"
+            :reduce="filter => filter.value"
+            :placeholder="$t('chart:edit.filter.noFilter')"
+          />
+        </b-form-group>
+
+        <template #modal-footer="{ ok }">
+          <b-button
+            variant="light"
+            @click="resetLiveFilter()"
+          >
+            Reset
+          </b-button>
+          <b-button
+            variant="primary"
+            @click="ok()"
+          >
+            Save and Close
+          </b-button>
+        </template>
+      </b-modal>
+    </template>
+
     <chart-component
       v-if="chart"
       :key="key"
@@ -14,6 +68,7 @@
     />
   </wrap>
 </template>
+
 <script>
 import { mapActions } from 'vuex'
 import base from './base'
@@ -39,6 +94,24 @@ export default {
       filter: undefined,
 
       drillDownFilter: undefined,
+
+      liveFilterModal: {
+        title: 'Live chart filter',
+        show: false,
+      },
+
+      predefinedFilters: [
+        ...compose.chartUtil.predefinedFilters.map(pf => ({ ...pf, text: this.$t(`chart:edit.filter.${pf.text}`) })),
+      ],
+
+      selectedFilter: undefined,
+
+      customDate: {
+        start: undefined,
+        end: undefined,
+      },
+
+      liveFilterValue: undefined,
     }
   },
 
@@ -106,6 +179,10 @@ export default {
 
       let filter = r.filter
 
+      if (this.liveFilterValue) {
+        filter = this.liveFilterValue
+      }
+
       if (filter) {
         // If we use ${record} or ${ownerID} and there is no record, resolve empty
         /* eslint-disable no-template-curly-in-string */
@@ -127,6 +204,16 @@ export default {
       const { namespaceID } = this.namespace
 
       return this.$ComposeAPI.recordReport({ namespaceID, ...r, filter })
+    },
+
+    liveFilterUpdate () {
+      this.refresh()
+    },
+
+    resetLiveFilter () {
+      this.liveFilterValue = undefined
+      this.liveFilterModal.show = false
+      this.refresh()
     },
 
     refresh () {
@@ -217,3 +304,17 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.chart__livefilter-btn {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  border: 0;
+  padding: 5px;
+  position: absolute;
+  margin-top: 10px;
+  right: 15px;
+  z-index: 1;
+}
+</style>
