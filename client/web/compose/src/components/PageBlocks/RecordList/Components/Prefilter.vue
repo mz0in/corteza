@@ -118,12 +118,28 @@ export default {
 
   computed: {
     filterSuggestionTree () {
-      const moduleFields = (this.module.fields || []).map(({ name }) => name)
-      const userProperties = this.$auth.user.properties()
-      const recordProperties = this.record ? this.record.properties() : undefined
-      const recordValueFields = this.record ? Object.keys(this.record.values) : undefined
+      const { fields = [] } = this.module || {}
+      const moduleFields = fields.map(({ name }) => name)
 
-      return getRecordBasedSuggestions({ moduleFields, userProperties, recordProperties, isRecordPage: this.onRecordPage, recordValueFields })
+      return getRecordBasedSuggestions([
+        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
+        ...(['AND', 'OR'].map(v => ({ interpolate: false, value: v, properties: [] }))),
+        { interpolate: true, value: 'user', properties: this.$auth.user.properties() || [] },
+        ...(this.onRecordPage ? [
+          ...(['ownerID', 'userID', 'recordID'].map(v => ({ interpolate: true, value: v, properties: [] }))),
+          {
+            interpolate: true,
+            value: 'record',
+            properties: [
+              ...this.record.properties(),
+              {
+                value: 'values',
+                properties: Object.keys(this.record.values),
+              },
+            ] || [],
+          },
+        ] : []),
+      ])
     },
   },
 

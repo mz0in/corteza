@@ -651,13 +651,8 @@ export default {
       return this.datasources.processing || hasDuplicates
     },
 
-<<<<<<< HEAD
     showEditor () {
       return this.editor && this.editor.currentIndex !== undefined
-=======
-    onRecordPage () {
-      return this.page && this.page.moduleID !== NoID
->>>>>>> 84bc8eef2 (extend filter fields functionality)
     },
   },
 

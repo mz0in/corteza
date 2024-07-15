@@ -454,7 +454,6 @@ export class Record {
       'moduleID',
       'namespaceID',
       'revision',
-      'values',
       'meta',
       'createdAt',
       'updatedAt',

@@ -3,6 +3,7 @@
     class="position-relative"
   >
     <c-ace-editor
+      auto-complete
       v-model="editorValue"
       :initializeEditor="editorInit"
       v-bind="{ ...$attrs, ...$props }"
@@ -90,27 +91,6 @@ export default {
 
   methods: {
     editorInit (editor) {
-      require('brace/mode/javascript')
-
-      require('brace/theme/chrome')
-      require('brace/ext/language_tools')
-
-      editor.setOptions({
-        tabSize: 2,
-        fontSize: this.fontSize,
-        wrap: true,
-        indentedSoftWrap: false,
-        showPrintMargin: this.showPrintMargin,
-        showLineNumbers: this.showLineNumbers,
-        showGutter: this.showLineNumbers,
-        displayIndentGuides: this.lang !== 'text',
-        useWorker: false,
-        readOnly: this.readOnly,
-        highlightActiveLine: this.highlightActiveLine,
-        enableBasicAutocompletion: true,
-        enableLiveAutocompletion: true,
-      })
-
       const staticWordCompleter = {
         getCompletions: (editor, session, pos, prefix, callback) => {
           const context = this.getContext(editor, session, pos);
@@ -182,21 +162,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss">
-.ace_editor {
-  color: var(--black) !important;
-  background-color: var(--white) !important;
-  border-radius: 0.25rem;
-  border: 2px solid var(--extra-light);
-
-  .ace_gutter {
-    background-color: var(--light) !important;
-    color: var(--black) !important;
-
-    .ace_gutter-active-line {
-      background-color: var(--extra-light) !important;
-    }
-  }
-}
-</style>

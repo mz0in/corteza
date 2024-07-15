@@ -361,7 +361,7 @@
 <script>
 import { compose, NoID } from '@cortezaproject/corteza-js'
 import { handle, components } from '@cortezaproject/corteza-vue'
-import { getRecordBasedSuggestions, getVisibilityConditionBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
+import { getRecordBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
 import PageTranslator from 'corteza-webapp-compose/src/components/Admin/Page/PageTranslator'
 import PageBlock from './index'
 
@@ -479,21 +479,52 @@ export default {
     },
 
     autoCompleteSuggestionTree () {
-      const moduleFields = (this.module.fields || []).map(({ name }) => name)
-      const userProperties = this.$auth.user.properties()
-      const recordProperties = this.record ? this.record.properties() : undefined
-      const recordValueFields = this.record ? Object.keys(this.record.values) : undefined
+      const { fields = [] } = this.module || {}
+      const moduleFields = fields.map(({ name }) => name)
 
-      return getRecordBasedSuggestions({ moduleFields, userProperties, recordProperties, isRecordPage: this.isRecordPage, recordValueFields })
+      return getRecordBasedSuggestions([
+        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
+        ...(['AND', 'OR'].map(v => ({ interpolate: false, value: v, properties: [] }))),
+        { interpolate: true, value: 'user', properties: this.$auth.user.properties() || [] },
+        ...(this.onRecordPage ? [
+          ...(['ownerID', 'userID', 'recordID'].map(v => ({ interpolate: true, value: v, properties: [] }))),
+          {
+            interpolate: true,
+            value: 'record',
+            properties: [
+              ...this.record.properties(),
+              {
+                value: 'values',
+                properties: Object.keys(this.record.values),
+              },
+            ] || [],
+          },
+        ] : []),
+      ])
     },
 
     visibilityAutoSuggestionTree () {
-      const moduleFields = (this.module.fields || []).map(({ name }) => name)
-      const userProperties = this.$auth.user.properties()
-      const recordProperties = this.record ? this.record.properties() : undefined
-      const recordValueFields = this.record ? Object.keys(this.record.values) : undefined
+      const { fields = [] } = this.module || {}
+      const moduleFields = fields.map(({ name }) => name)
 
-      return getVisibilityConditionBasedSuggestions({ moduleFields, userProperties, recordProperties, isRecordPage: this.isRecordPage, recordValueFields })
+      return getRecordBasedSuggestions([
+        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
+        { interpolate: false, value: 'user', properties: this.$auth.user.properties() || [] },
+        { interpolate: false, value: 'screen', properties: ['width', 'height', 'userAgent', 'breakpoint'] },
+        ...(this.onRecordPage ? [
+          {
+            interpolate: false,
+            value: 'record',
+            properties: [
+              ...this.record.properties(),
+              {
+                value: 'values',
+                properties: Object.keys(this.record.values),
+              },
+            ] || [],
+          },
+        ] : []),
+      ])
     },
   },
 

@@ -120,11 +120,6 @@ export default {
 
   methods: {
     editorInit (editor) {
-      if (this.initializeEditor && typeof this.initializeEditor === 'function') {
-        this.initializeEditor(editor)
-        return
-      }
-
       require('brace/mode/text')
       require('brace/mode/html')
       require('brace/mode/css')
@@ -165,6 +160,11 @@ export default {
           enableEmmet: true
         }),
       })
+      
+      if (this.initializeEditor && typeof this.initializeEditor === 'function') {
+        this.initializeEditor(editor)
+        return
+      }
       
       const self = this;
       const staticWordCompleter = {
