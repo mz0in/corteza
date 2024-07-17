@@ -23,7 +23,7 @@
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.titlePlaceholder')"
-                :suggestion-tree="autoCompleteSuggestionTree"
+                :suggestion-params="autoCompleteParams"
                 height="37.59px"
                 class="flex-grow-1"
               />
@@ -64,7 +64,7 @@
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.descriptionPlaceholder')"
-                :suggestion-tree="autoCompleteSuggestionTree"
+                :suggestion-params="autoCompleteParams"
                 height="55.16px"
                 class="flex-grow-1"
               />
@@ -273,7 +273,7 @@
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.visibility.condition.placeholder')"
-                :suggestion-tree="visibilityAutoSuggestionTree"
+                :suggestion-params="visibilityAutoSuggestionTree"
                 height="37.59px"
                 class="flex-grow-1"
               />
@@ -361,7 +361,6 @@
 <script>
 import { compose, NoID } from '@cortezaproject/corteza-js'
 import { handle, components } from '@cortezaproject/corteza-vue'
-import { getRecordBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
 import PageTranslator from 'corteza-webapp-compose/src/components/Admin/Page/PageTranslator'
 import PageBlock from './index'
 
@@ -478,53 +477,56 @@ export default {
       },
     },
 
-    autoCompleteSuggestionTree () {
+    autoCompleteParams () {
       const { fields = [] } = this.module || {}
       const moduleFields = fields.map(({ name }) => name)
+      const userProperties = this.$auth.user.properties() || []
+      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
+      const recordProperties = this.record.properties() || []
 
-      return getRecordBasedSuggestions([
-        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
-        ...(['AND', 'OR'].map(v => ({ interpolate: false, value: v, properties: [] }))),
-        { interpolate: true, value: 'user', properties: this.$auth.user.properties() || [] },
-        ...(this.onRecordPage ? [
-          ...(['ownerID', 'userID', 'recordID'].map(v => ({ interpolate: true, value: v, properties: [] }))),
-          {
-            interpolate: true,
-            value: 'record',
-            properties: [
-              ...this.record.properties(),
-              {
-                value: 'values',
-                properties: Object.keys(this.record.values),
-              },
-            ] || [],
-          },
-        ] : []),
-      ])
+      const recordSuggestions = this.isRecordPage ? [
+        ...(['ownerID', 'userID', 'recordID'].map(value => ({ interpolate: true, value }))),
+        {
+          interpolate: true,
+          value: 'record',
+          properties: [
+            ...recordProperties,
+            recordValueProperties,
+          ],
+        },
+      ] : []
+
+      return [
+        ...['AND', 'OR'],
+        ...moduleFields,
+        ...recordSuggestions,
+        { interpolate: true, value: 'user', properties: userProperties },
+      ]
     },
 
     visibilityAutoSuggestionTree () {
       const { fields = [] } = this.module || {}
       const moduleFields = fields.map(({ name }) => name)
+      const userProperties = this.$auth.user.properties() || []
+      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
+      const recordProperties = this.record.properties() || []
 
-      return getRecordBasedSuggestions([
-        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
-        { interpolate: false, value: 'user', properties: this.$auth.user.properties() || [] },
-        { interpolate: false, value: 'screen', properties: ['width', 'height', 'userAgent', 'breakpoint'] },
-        ...(this.onRecordPage ? [
-          {
-            interpolate: false,
-            value: 'record',
-            properties: [
-              ...this.record.properties(),
-              {
-                value: 'values',
-                properties: Object.keys(this.record.values),
-              },
-            ] || [],
-          },
-        ] : []),
-      ])
+      const recordSuggestions = this.isRecordPage ? [
+        {
+          value: 'record',
+          properties: [
+            ...recordProperties,
+            recordValueProperties,
+          ],
+        },
+      ] : []
+
+      return [
+        ...moduleFields,
+        ...recordSuggestions,
+        { value: 'user', properties: userProperties },
+        { value: 'screen', properties: ['width', 'height', 'userAgent', 'breakpoint'] },
+      ]
     },
   },
 

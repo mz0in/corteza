@@ -4,8 +4,9 @@
   >
     <c-ace-editor
       auto-complete
+      init-expressions
       v-model="editorValue"
-      :initializeEditor="editorInit"
+      :auto-complete-suggestions="autoCompleteSuggestions"
       v-bind="{ ...$attrs, ...$props }"
       v-on="$listeners"
     />
@@ -71,9 +72,9 @@ export default {
       default: false,
     },
 
-    suggestionTree: {
-      type: Object,
-      default: () => ({})
+    suggestionParams: {
+      type: Array,
+      default: []
     }
   },
 
@@ -87,78 +88,66 @@ export default {
         this.$emit('update:value', value)
       },
     },
+
+    autoCompleteSuggestions () {
+      return this.getRecordBasedSuggestions(this.suggestionParams);
+    }
   },
 
   methods: {
-    editorInit (editor) {
-      const staticWordCompleter = {
-        getCompletions: (editor, session, pos, prefix, callback) => {
-          const context = this.getContext(editor, session, pos);
-          const suggestions = this.getSuggestionsForContext(context);
+    getRecordBasedSuggestions(params = []) {
+      const result = {}
 
-          callback(null, suggestions.map(suggestion => {
-            let caption = ''
-            let value = ''
-
-            if (typeof suggestion === 'string') {
-              caption = suggestion
-              value = suggestion
-            } else {
-              caption = suggestion.caption
-              value = suggestion.value
-            }
-
-            return {
-              caption,
-              value,
-              meta: "variable",
-              completer: {
-                insertMatch: function (insertEditor, data) {
-                  let insertValue = data.value;
-
-                  insertEditor.jumpToMatching();
-                  const line = session.getLine(pos.row)
-                  let lastSpaceIndex = line.lastIndexOf(' ') >= 0 ? line.lastIndexOf(' ') : 0;
-
-                  if (lastSpaceIndex > 0) {
-                    lastSpaceIndex += 1
-                  }
-
-                  insertEditor.session.replace({
-                    start: { row: pos.row, column: lastSpaceIndex },
-                    end: { row: pos.row, column: pos.column }
-                  }, insertValue);
-                }
-              }
-            }
-          }))
-        }
+      function addSuggestion (key, caption, value) {
+        if (!result[key]) result[key] = []
+        result[key].push({ caption: caption, value: value })
       }
 
-      editor.completers = [staticWordCompleter]
+      function processProperties (prefix, properties, interpolate) {
+        (properties || []).forEach((prop) => {
+          if (typeof prop === 'string') {
+            let value = prefix + '.' + prop + (interpolate ? '}' : '')
+            addSuggestion(prefix, prop, value)
+          } else {
+            let nestedPrefix = prefix + '.' + prop.value + '.'
+            addSuggestion(prefix, prop.value, nestedPrefix)
 
-      editor.commands.on("afterExec", function (e) {
-        if (["insertstring", "Return"].includes(e.command.name) || /^[\w.($]$/.test(e.args)) {
-          editor.execCommand("startAutocomplete");
+            if (prop.properties) {
+              (prop.properties || []).forEach((nestedProp) => {
+                let nestedValue = nestedPrefix + nestedProp + (interpolate ? '}' : '')
+                addSuggestion(prefix + '.' + prop.value, nestedProp, nestedValue)
+              })
+            }
+          }
+        })
+      }
+
+      (params || []).forEach((p) => {
+        if (typeof p === 'string') {
+          addSuggestion('', '', p)
+        } else {
+          const { interpolate = false, properties = [], value, root = true } = p
+          let prefix = interpolate ? '${' : ''
+          let suffix = interpolate && !properties.length ? '}' : ''
+          let prefixAsValue = prefix + value + suffix + (properties.length > 0 ? '.' : '')
+
+          if (root) {
+            addSuggestion('', '', prefixAsValue)
+          }
+
+          if (interpolate) {
+            addSuggestion('$', prefixAsValue.slice(1), prefixAsValue)
+            addSuggestion('${', prefixAsValue.slice(2), prefixAsValue)
+          }
+
+          if (properties.length) {
+            processProperties(prefix + value, properties, interpolate)
+          }
         }
-      });
+      })
 
-      editor.renderer.setScrollMargin(7, 7)
-      editor.renderer.setPadding(10)
-    },
-    getContext (editor, session, pos) {
-      const line = session.getLine(pos.row)
-      const lastSpaceIndex = line.lastIndexOf(' ') >= 0 ? line.lastIndexOf(' ') : 0;
-      const textBeforeCursor = line.slice(lastSpaceIndex, pos.column);
-      const context = textBeforeCursor.split('.').slice(0, -1).join('.').trim();
-
-      return context
-    },
-    getSuggestionsForContext (context) {
-      const suggestions = this.suggestionTree;
-
-      return suggestions[context] || [];
-    },
+      return result
+    }
   },
 }
 </script>

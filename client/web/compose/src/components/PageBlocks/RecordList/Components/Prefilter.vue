@@ -12,7 +12,7 @@
               v-model="options.prefilter"
               height="59px"
               lang="javascript"
-              :suggestion-tree="filterSuggestionTree"
+              :suggestion-params="filterSuggestionParams"
             />
 
             <i18next
@@ -64,7 +64,7 @@ import {
   trimChar,
 } from 'corteza-webapp-compose/src/lib/record-filter.js'
 import FilterToolbox from 'corteza-webapp-compose/src/components/Common/FilterToolbox.vue'
-import { getRecordBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
+// import { getRecordBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
 
 const { CInputExpressions } = components
 
@@ -117,29 +117,31 @@ export default {
   },
 
   computed: {
-    filterSuggestionTree () {
+    filterSuggestionParams () {
       const { fields = [] } = this.module || {}
       const moduleFields = fields.map(({ name }) => name)
+      const userProperties = this.$auth.user.properties() || []
+      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
+      const recordProperties = this.record.properties() || []
 
-      return getRecordBasedSuggestions([
-        ...(moduleFields.map(v => ({ interpolate: false, value: v, properties: [] }))),
-        ...(['AND', 'OR'].map(v => ({ interpolate: false, value: v, properties: [] }))),
-        { interpolate: true, value: 'user', properties: this.$auth.user.properties() || [] },
-        ...(this.onRecordPage ? [
-          ...(['ownerID', 'userID', 'recordID'].map(v => ({ interpolate: true, value: v, properties: [] }))),
-          {
-            interpolate: true,
-            value: 'record',
-            properties: [
-              ...this.record.properties(),
-              {
-                value: 'values',
-                properties: Object.keys(this.record.values),
-              },
-            ] || [],
-          },
-        ] : []),
-      ])
+      const recordSuggestions = this.onRecordPage ? [
+        ...(['ownerID', 'userID', 'recordID'].map(value => ({ interpolate: true, value }))),
+        {
+          interpolate: true,
+          value: 'record',
+          properties: [
+            ...recordProperties,
+            recordValueProperties,
+          ],
+        },
+      ] : []
+
+      return [
+        ...['AND', 'OR'],
+        ...moduleFields,
+        ...recordSuggestions,
+        { interpolate: true, value: 'user', properties: userProperties },
+      ]
     },
   },
 
