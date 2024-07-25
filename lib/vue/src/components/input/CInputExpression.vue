@@ -75,7 +75,17 @@ export default {
     suggestionParams: {
       type: Array,
       default: []
-    }
+    },
+
+    fontFamily: {
+      type: String,
+      default: ""
+    },
+
+    placeholder: {
+      type: String,
+      default: ""
+    },
   },
 
   computed: {

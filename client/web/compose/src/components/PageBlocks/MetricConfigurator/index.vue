@@ -147,10 +147,14 @@
                 :label="$t('metric.edit.filterLabel')"
                 label-class="text-primary"
               >
-                <b-form-textarea
+                <c-input-expression
                   v-model="edit.filter"
+                  auto-complete
+                  lang="javascript"
                   placeholder="(A > B) OR (A < C)"
                   class="mb-1"
+                  height="55.16px"
+                  :suggestion-params="recordAutoCompleteParams"
                 />
 
                 <i18next
@@ -203,10 +207,14 @@
                 :label="$t('metric.edit.transformFunctionLabel')"
                 label-class="text-primary"
               >
-                <b-form-textarea
+                <c-input-expression
                   v-model="edit.transformFx"
+                  auto-complete
+                  lang="javascript"
                   placeholder="v"
                   class="mb-1"
+                  height="55.16px"
+                  :suggestion-params="recordAutoCompleteParams"
                 />
 
                 <small>{{ $t('metric.edit.transformFunctionDescription') }}</small>
@@ -349,7 +357,11 @@ import MStyle from './MStyle'
 import { mapGetters } from 'vuex'
 import MetricBase from '../MetricBase'
 import ColumnPicker from 'corteza-webapp-compose/src/components/Admin/Module/Records/ColumnPicker'
+import autocomplete from 'corteza-webapp-compose/src/mixins/autocomplete.js'
 import { compose, NoID } from '@cortezaproject/corteza-js'
+import { components } from '@cortezaproject/corteza-vue'
+
+const { CInputExpression } = components
 
 export default {
   i18nOptions: {
@@ -361,8 +373,11 @@ export default {
     MStyle,
     MetricBase,
     ColumnPicker,
+    CInputExpression,
   },
   extends: base,
+
+  mixins: [autocomplete],
 
   data () {
     return {
@@ -434,6 +449,10 @@ export default {
       if (!this.edit.moduleID) return undefined
 
       return this.getModuleByID(this.edit.moduleID)
+    },
+
+    recordAutoCompleteParams () {
+      return this.processRecordAutoCompleteParams({ module: this.selectedMetricModule })
     },
   },
 

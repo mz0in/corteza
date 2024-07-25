@@ -448,7 +448,7 @@ export class Record {
     return this.meta
   }
 
-  properties (): string[] {
+  get properties (): string[] {
     return [
       'recordID',
       'moduleID',

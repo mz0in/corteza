@@ -50,10 +50,13 @@
               :label="$t('metric.edit.filterLabel')"
               label-class="text-primary"
             >
-              <b-form-textarea
+              <c-input-expression
                 v-model="options.value.filter"
+                height="59"
+                lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"
+                :suggestion-params="recordAutoCompleteParams.value"
               />
               <i18next
                 path="metric.edit.filterFootnote"
@@ -159,10 +162,13 @@
               :label="$t('metric.edit.filterLabel')"
               label-class="text-primary"
             >
-              <b-form-textarea
+              <c-input-expression
                 v-model="options.minValue.filter"
+                height="59"
+                lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"
+                :suggestion-params="recordAutoCompleteParams.min"
               />
               <i18next
                 path="metric.edit.filterFootnote"
@@ -268,10 +274,13 @@
               :label="$t('metric.edit.filterLabel')"
               label-class="text-primary"
             >
-              <b-form-textarea
+              <c-input-expression
                 v-model="options.maxValue.filter"
+                height="59"
+                lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"
+                :suggestion-params="recordAutoCompleteParams.max"
               />
               <i18next
                 path="metric.edit.filterFootnote"
@@ -529,8 +538,12 @@
 <script>
 import base from './base'
 import { mapGetters } from 'vuex'
+import { components } from '@cortezaproject/corteza-vue'
 import { compose, validator } from '@cortezaproject/corteza-js'
+import autocomplete from 'corteza-webapp-compose/src/mixins/autocomplete.js'
 import FieldViewer from '../ModuleFields/Viewer'
+
+const { CInputExpression } = components
 
 export default {
   i18nOptions: {
@@ -541,9 +554,12 @@ export default {
 
   components: {
     FieldViewer,
+    CInputExpression,
   },
 
   extends: base,
+
+  mixins: [autocomplete],
 
   data () {
     return {
@@ -606,6 +622,10 @@ export default {
       ]
     },
 
+    valueModule () {
+      return this.moduleByID(this.options.value.moduleID)
+    },
+
     minValueModuleFields () {
       return [
         ...this.sharedModuleFields,
@@ -613,11 +633,27 @@ export default {
       ]
     },
 
+    minValueModule () {
+      return this.moduleByID(this.options.minValue.moduleID)
+    },
+
     maxValueModuleFields () {
       return [
         ...this.sharedModuleFields,
         ...this.moduleByID(this.options.maxValue.moduleID).fields.filter(f => f.kind === 'Number').sort((a, b) => a.label.localeCompare(b.label)),
       ]
+    },
+
+    maxValueModule () {
+      return this.moduleByID(this.options.maxValue.moduleID)
+    },
+
+    recordAutoCompleteParams () {
+      return {
+        value: this.processRecordAutoCompleteParams({ module: this.valueModule, operators: true }),
+        min: this.processRecordAutoCompleteParams({ module: this.minValueModule, operators: true }),
+        max: this.processRecordAutoCompleteParams({ module: this.maxValueModule, operators: true }),
+      }
     },
   },
 

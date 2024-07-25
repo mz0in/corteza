@@ -17,14 +17,14 @@
             label-class="text-primary"
           >
             <b-input-group>
-              <c-input-expressions
+              <c-input-expression
                 id="title"
                 v-model="block.title"
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.titlePlaceholder')"
-                :suggestion-params="autoCompleteParams"
-                height="37.59px"
+                :suggestion-params="recordAutoCompleteParams"
+                height="38"
                 class="flex-grow-1"
               />
 
@@ -58,13 +58,13 @@
             label-class="text-primary"
           >
             <b-input-group>
-              <c-input-expressions
+              <c-input-expression
                 id="description"
                 v-model="block.description"
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.descriptionPlaceholder')"
-                :suggestion-params="autoCompleteParams"
+                :suggestion-params="recordAutoCompleteParams"
                 height="55.16px"
                 class="flex-grow-1"
               />
@@ -267,14 +267,14 @@
                   ƒ
                 </b-button>
               </b-input-group-prepend>
-              <c-input-expressions
+              <c-input-expression
                 id="visibility-fields"
                 v-model="block.meta.visibility.expression"
                 auto-complete
                 lang="javascript"
                 :placeholder="$t('general.visibility.condition.placeholder')"
-                :suggestion-params="visibilityAutoSuggestionTree"
-                height="37.59px"
+                :suggestion-params="visibilityAutoCompleteParams"
+                height="38"
                 class="flex-grow-1"
               />
               <b-input-group-append>
@@ -358,13 +358,15 @@
     </template>
   </b-tabs>
 </template>
+
 <script>
 import { compose, NoID } from '@cortezaproject/corteza-js'
 import { handle, components } from '@cortezaproject/corteza-vue'
 import PageTranslator from 'corteza-webapp-compose/src/components/Admin/Page/PageTranslator'
+import autocomplete from 'corteza-webapp-compose/src/mixins/autocomplete.js'
 import PageBlock from './index'
 
-const { CInputExpressions } = components
+const { CInputExpression } = components
 
 export default {
   i18nOptions: {
@@ -374,8 +376,10 @@ export default {
   components: {
     PageBlock,
     PageTranslator,
-    CInputExpressions,
+    CInputExpression,
   },
+
+  mixins: [autocomplete],
 
   props: {
     block: {
@@ -398,6 +402,11 @@ export default {
       type: [Object, null],
       required: false,
       default: null,
+    },
+
+    namespace: {
+      type: compose.Namespace,
+      required: true,
     },
   },
 
@@ -476,58 +485,6 @@ export default {
         this.$set(this.block.meta.visibility, 'roles', roles)
       },
     },
-
-    autoCompleteParams () {
-      const { fields = [] } = this.module || {}
-      const moduleFields = fields.map(({ name }) => name)
-      const userProperties = this.$auth.user.properties() || []
-      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
-      const recordProperties = this.record.properties() || []
-
-      const recordSuggestions = this.isRecordPage ? [
-        ...(['ownerID', 'userID', 'recordID'].map(value => ({ interpolate: true, value }))),
-        {
-          interpolate: true,
-          value: 'record',
-          properties: [
-            ...recordProperties,
-            recordValueProperties,
-          ],
-        },
-      ] : []
-
-      return [
-        ...['AND', 'OR'],
-        ...moduleFields,
-        ...recordSuggestions,
-        { interpolate: true, value: 'user', properties: userProperties },
-      ]
-    },
-
-    visibilityAutoSuggestionTree () {
-      const { fields = [] } = this.module || {}
-      const moduleFields = fields.map(({ name }) => name)
-      const userProperties = this.$auth.user.properties() || []
-      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
-      const recordProperties = this.record.properties() || []
-
-      const recordSuggestions = this.isRecordPage ? [
-        {
-          value: 'record',
-          properties: [
-            ...recordProperties,
-            recordValueProperties,
-          ],
-        },
-      ] : []
-
-      return [
-        ...moduleFields,
-        ...recordSuggestions,
-        { value: 'user', properties: userProperties },
-        { value: 'screen', properties: ['width', 'height', 'userAgent', 'breakpoint'] },
-      ]
-    },
   },
 
   created () {
@@ -577,6 +534,7 @@ export default {
   },
 }
 </script>
+
 <style scoped>
 .mh-tab {
   max-height: calc(100vh - 16rem);

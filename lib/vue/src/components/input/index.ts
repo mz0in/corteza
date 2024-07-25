@@ -8,7 +8,7 @@ export { default as CRichTextInput } from './CRichTextInput/index.vue'
 export { default as CInputCheckbox } from './CInputCheckbox.vue'
 export { default as CInputColorPicker } from './CInputColorPicker.vue'
 export { default as CAceEditor } from './CAceEditor.vue'
-export { default as CInputExpressions } from './CInputExpressions.vue'
+export { default as CInputExpression } from './CInputExpression.vue'
 export {
   CButtonSubmit,
 } from './button'

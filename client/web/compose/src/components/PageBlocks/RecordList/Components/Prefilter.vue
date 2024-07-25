@@ -8,11 +8,11 @@
       <b-row v-if="textInput">
         <b-col>
           <b-form-group label-class="text-primary">
-            <c-input-expressions
+            <c-input-expression
               v-model="options.prefilter"
-              height="59px"
+              height="59"
               lang="javascript"
-              :suggestion-params="filterSuggestionParams"
+              :suggestion-params="recordAutoCompleteParams"
             />
 
             <i18next
@@ -64,9 +64,9 @@ import {
   trimChar,
 } from 'corteza-webapp-compose/src/lib/record-filter.js'
 import FilterToolbox from 'corteza-webapp-compose/src/components/Common/FilterToolbox.vue'
-// import { getRecordBasedSuggestions } from 'corteza-webapp-compose/src/lib/suggestions-tree.js'
+import autocomplete from 'corteza-webapp-compose/src/mixins/autocomplete.js'
 
-const { CInputExpressions } = components
+const { CInputExpression } = components
 
 export default {
   i18nOptions: {
@@ -77,8 +77,10 @@ export default {
 
   components: {
     FilterToolbox,
-    CInputExpressions,
+    CInputExpression,
   },
+
+  mixins: [autocomplete],
 
   props: {
     options: {
@@ -101,12 +103,6 @@ export default {
       required: false,
       default: null,
     },
-
-    onRecordPage: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
   },
 
   data () {
@@ -117,31 +113,8 @@ export default {
   },
 
   computed: {
-    filterSuggestionParams () {
-      const { fields = [] } = this.module || {}
-      const moduleFields = fields.map(({ name }) => name)
-      const userProperties = this.$auth.user.properties() || []
-      const recordValueProperties = { value: 'values', properties: Object.keys(this.record.values) || [] }
-      const recordProperties = this.record.properties() || []
-
-      const recordSuggestions = this.onRecordPage ? [
-        ...(['ownerID', 'userID', 'recordID'].map(value => ({ interpolate: true, value }))),
-        {
-          interpolate: true,
-          value: 'record',
-          properties: [
-            ...recordProperties,
-            recordValueProperties,
-          ],
-        },
-      ] : []
-
-      return [
-        ...['AND', 'OR'],
-        ...moduleFields,
-        ...recordSuggestions,
-        { interpolate: true, value: 'user', properties: userProperties },
-      ]
+    recordAutoCompleteParams () {
+      return this.processRecordAutoCompleteParams({ operators: true })
     },
   },
 

@@ -19,7 +19,7 @@ export {
   CInputCheckbox,
   CInputColorPicker,
   CAceEditor,
-  CInputExpressions,
+  CInputExpression,
   CButtonSubmit,
   CInputSelect,
 } from './input'
