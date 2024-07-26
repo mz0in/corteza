@@ -11,7 +11,7 @@ const (
 	strBoolFalseAlt = ""
 
 	datetimeInternalFormatDate = "2006-01-02"
-	datetimeIntenralFormatTime = "15:04:05"
+    datetimeInternalFormatTime = "15:04:05"
 	datetimeInternalFormatFull = time.RFC3339
 
 	fieldOpt_Datetime_onlyDate         = "onlyDate"

@@ -86,7 +86,7 @@ export default {
       },
 
       set (date) {
-        this.$emit('input', setDate(date, this.value, this.noDate, this.noTime))
+        this.$emit('input', setDate(date, this.value, this.noDate))
       },
     },
 
@@ -96,7 +96,7 @@ export default {
       },
 
       set (time) {
-        this.$emit('input', setTime(time, this.value, this.noDate, this.noTime))
+        this.$emit('input', setTime(time, this.value, this.noTime))
       },
     },
 

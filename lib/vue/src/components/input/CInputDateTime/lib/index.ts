@@ -29,13 +29,9 @@ export function getTime (value: string|undefined): string | undefined {
   return value
 }
 
-export function setDate (date: string|undefined, value: string|undefined, noDate = false, noTime = false): string | undefined {
+export function setDate (date: string|undefined, value: string|undefined, noDate = false): string | undefined {
   if (noDate || !date || !date.length) {
     return undefined
-  }
-
-  if (noTime) {
-    return moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD')
   }
 
   const time = getTime(value) || '00:00'
@@ -43,13 +39,9 @@ export function setDate (date: string|undefined, value: string|undefined, noDate
   return moment(date + ' ' + time, 'YYYY-MM-DD HH:mm').utc().format()
 }
 
-export function setTime (time: string|undefined, value: string|undefined, noDate = false, noTime = false): string | undefined {
+export function setTime (time: string|undefined, value: string|undefined, noTime = false): string | undefined {
   if (noTime || !time || !time.length) {
     return undefined
-  }
-
-  if (noDate) {
-    return moment(time, 'HH:mm').format('HH:mm')
   }
 
   // Default to today if date not provided

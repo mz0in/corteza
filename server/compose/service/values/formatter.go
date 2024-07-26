@@ -91,25 +91,12 @@ func (formatter) fDatetime(v *types.RecordValue, f *types.ModuleField) *types.Re
 		internalFormat string
 	)
 
-	if f.Options.Bool("onlyDate") {
-		internalFormat = datetimeInternalFormatDate
-		dbFormats = []string{
-			datetimeInternalFormatDate,
-		}
-	} else if f.Options.Bool("onlyTime") {
-		internalFormat = datetimeIntenralFormatTime
-		dbFormats = []string{
-			datetimeIntenralFormatTime,
-			"15:04",
-		}
-	} else {
-		internalFormat = datetimeInternalFormatFull
-		// date & time
-		dbFormats = []string{
-			datetimeInternalFormatFull,
-			"2006-01-02 15:04:05",
-			"2006-01-02 15:04",
-		}
+    internalFormat = datetimeInternalFormatFull
+    // date & time
+    dbFormats = []string{
+        datetimeInternalFormatFull,
+        "2006-01-02 15:04:05",
+        "2006-01-02 15:04",
 	}
 
 	for _, format := range dbFormats {

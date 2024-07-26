@@ -308,27 +308,13 @@ func (vldtr validator) vBool(ctx context.Context, v *types.RecordValue, f *types
 
 func (vldtr validator) vDatetime(ctx context.Context, v *types.RecordValue, f *types.ModuleField, r *types.Record, m *types.Module) []types.RecordValueError {
 	var (
-		inputFormat string
 		t           time.Time
 		err         error
 
 		// We'll validate against this value
 		refTime = vldtr.now()
+        inputFormat = datetimeInternalFormatFull
 	)
-
-	if f.Options.Bool(fieldOpt_Datetime_onlyDate) {
-		inputFormat = datetimeInternalFormatDate
-
-		// Round down ref time to midnight
-		refTime = time.Date(refTime.Year(), refTime.Month(), refTime.Day(), 0, 0, 0, 0, refTime.Location())
-	} else if f.Options.Bool(fieldOpt_Datetime_onlyTime) {
-		inputFormat = datetimeIntenralFormatTime
-
-		// Round down ref time to day one
-		refTime = time.Date(0, 1, 1, refTime.Hour(), refTime.Minute(), refTime.Second(), refTime.Nanosecond(), refTime.Location())
-	} else {
-		inputFormat = datetimeInternalFormatFull
-	}
 
 	t, err = time.Parse(inputFormat, v.Value)
 	if err != nil {
