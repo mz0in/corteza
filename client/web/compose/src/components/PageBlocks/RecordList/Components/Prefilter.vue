@@ -10,7 +10,7 @@
           <b-form-group label-class="text-primary">
             <c-input-expression
               v-model="options.prefilter"
-              height="59"
+              height="3.688rem"
               lang="javascript"
               :suggestion-params="recordAutoCompleteParams"
             />

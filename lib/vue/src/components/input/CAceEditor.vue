@@ -3,8 +3,8 @@
     class="position-relative"
   >
     <ace-editor
-      v-model="editorValue"
       ref="aceeditor"
+      v-model="editorValue"
       :lang="lang"
       :mode="lang"
       theme="chrome"
@@ -31,7 +31,7 @@
 <script>
 import AceEditor from 'vue2-ace-editor'
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faExpandAlt} from '@fortawesome/free-solid-svg-icons'
+import { faExpandAlt } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faExpandAlt)
 
@@ -80,7 +80,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    
+
     autoComplete: {
       type: Boolean,
       default: false,
@@ -98,7 +98,7 @@ export default {
 
     autoCompleteSuggestions: {
       type: [Array, Object],
-      default: () => ([])
+      default: () => ([]),
     },
 
     initExpressions: {
@@ -108,12 +108,12 @@ export default {
 
     fontFamily: {
       type: String,
-      default: ""
+      default: '',
     },
 
     placeholder: {
       type: String,
-      default: ""
+      default: '',
     },
   },
 
@@ -138,7 +138,7 @@ export default {
       require('brace/mode/json')
       require('brace/mode/javascript')
       require('brace/mode/json')
-      
+
       require('brace/snippets/text')
       require('brace/snippets/html')
       require('brace/snippets/css')
@@ -171,23 +171,24 @@ export default {
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true,
           enableSnippets: true,
-          enableEmmet: true
+          enableEmmet: true,
         }),
 
         ...(this.fontFamily && { fontFamily: this.fontFamily }),
         ...(this.fontSize && { fontSize: this.fontSize }),
       })
 
-      editor.on("input", this.updatePlaceholder)
+      editor.on('input', this.updatePlaceholder)
       this.updatePlaceholder(undefined, editor)
 
       if (this.initExpressions) {
         this.processExpressionAutoComplete(editor)
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this
         const staticWordCompleter = {
           getCompletions: function (editor, session, pos, prefix, callback) {
-            let autoCompleteSuggestions = self.autoCompleteSuggestions
+            const autoCompleteSuggestions = self.autoCompleteSuggestions
             callback(
               null,
               autoCompleteSuggestions.map(function ({ caption, value, meta }) {
@@ -196,7 +197,7 @@ export default {
                   value,
                   meta,
                 }
-              })
+              }),
             )
           },
         }
@@ -208,18 +209,18 @@ export default {
     updatePlaceholder (_, editor) {
       if (!this.placeholder) return
 
-      let shouldShow = !editor.session.getValue().length
+      const shouldShow = !editor.session.getValue().length
       let node = editor.renderer.emptyMessageNode
 
       if (!shouldShow && node) {
         editor.renderer.scroller.removeChild(editor.renderer.emptyMessageNode)
         editor.renderer.emptyMessageNode = null
       } else if (shouldShow && !node) {
-        node = editor.renderer.emptyMessageNode = document.createElement("div")
+        node = editor.renderer.emptyMessageNode = document.createElement('div')
         node.textContent = this.placeholder
-        node.className = "ace_placeholder"
-        node.style.padding = "7px 10px"
-        node.style.position = "absolute"
+        node.className = 'ace_placeholder'
+        node.style.padding = '7px 10px'
+        node.style.position = 'absolute'
         node.style.zIndex = 9
         node.style.opacity = 0.5
         editor.renderer.scroller.appendChild(node)
@@ -247,10 +248,10 @@ export default {
             return {
               caption,
               value,
-              meta: "variable",
+              meta: 'variable',
               completer: {
                 insertMatch: function (insertEditor, data) {
-                  let insertValue = data.value
+                  const insertValue = data.value
 
                   insertEditor.jumpToMatching()
                   const line = session.getLine(pos.row)
@@ -262,20 +263,20 @@ export default {
 
                   insertEditor.session.replace({
                     start: { row: pos.row, column: lastSpaceIndex },
-                    end: { row: pos.row, column: pos.column }
+                    end: { row: pos.row, column: pos.column },
                   }, insertValue)
-                }
-              }
+                },
+              },
             }
           }))
-        }
+        },
       }
 
       editor.completers = [staticWordCompleter]
 
-      editor.commands.on("afterExec", function (e) {
-        if (["insertstring", "Return"].includes(e.command.name) || /^[\w.($]$/.test(e.args)) {
-          editor.execCommand("startAutocomplete")
+      editor.commands.on('afterExec', function (e) {
+        if (['insertstring', 'Return'].includes(e.command.name) || /^[\w.($]$/.test(e.args)) {
+          editor.execCommand('startAutocomplete')
         }
       })
 

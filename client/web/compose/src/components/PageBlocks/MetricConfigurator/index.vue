@@ -153,7 +153,7 @@
                   lang="javascript"
                   placeholder="(A > B) OR (A < C)"
                   class="mb-1"
-                  height="55.16px"
+                  height="3.448rem"
                   :suggestion-params="recordAutoCompleteParams"
                 />
 
@@ -213,7 +213,7 @@
                   lang="javascript"
                   placeholder="v"
                   class="mb-1"
-                  height="55.16px"
+                  height="3.448rem"
                   :suggestion-params="recordAutoCompleteParams"
                 />
 

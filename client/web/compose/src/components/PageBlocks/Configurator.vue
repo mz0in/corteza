@@ -24,7 +24,7 @@
                 lang="javascript"
                 :placeholder="$t('general.titlePlaceholder')"
                 :suggestion-params="recordAutoCompleteParams"
-                height="38"
+                height="2.375rem"
                 class="flex-grow-1"
               />
 
@@ -65,7 +65,7 @@
                 lang="javascript"
                 :placeholder="$t('general.descriptionPlaceholder')"
                 :suggestion-params="recordAutoCompleteParams"
-                height="55.16px"
+                height="3.448rem"
                 class="flex-grow-1"
               />
               <b-input-group-append>
@@ -274,7 +274,7 @@
                 lang="javascript"
                 :placeholder="$t('general.visibility.condition.placeholder')"
                 :suggestion-params="visibilityAutoCompleteParams"
-                height="38"
+                height="2.375rem"
                 class="flex-grow-1"
               />
               <b-input-group-append>

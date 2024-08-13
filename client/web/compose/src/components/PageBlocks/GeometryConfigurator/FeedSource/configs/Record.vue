@@ -64,7 +64,7 @@
           >
             <c-input-expression
               v-model="feed.options.prefilter"
-              height="59"
+              height="3.688rem"
               lang="javascript"
               :suggestion-params="recordAutoCompleteParams"
               :placeholder="$t('calendar.recordFeed.prefilterPlaceholder')"

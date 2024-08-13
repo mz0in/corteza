@@ -52,7 +52,7 @@
             >
               <c-input-expression
                 v-model="options.value.filter"
-                height="59"
+                height="3.688rem"
                 lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"
@@ -164,7 +164,7 @@
             >
               <c-input-expression
                 v-model="options.minValue.filter"
-                height="59"
+                height="3.688rem"
                 lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"
@@ -276,7 +276,7 @@
             >
               <c-input-expression
                 v-model="options.maxValue.filter"
-                height="59"
+                height="3.688rem"
                 lang="javascript"
                 placeholder="(A > B) OR (A < C)"
                 class="mb-1"

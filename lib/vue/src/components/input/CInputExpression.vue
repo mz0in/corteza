@@ -3,9 +3,9 @@
     class="position-relative"
   >
     <c-ace-editor
+      v-model="editorValue"
       auto-complete
       init-expressions
-      v-model="editorValue"
       :auto-complete-suggestions="autoCompleteSuggestions"
       v-bind="{ ...$attrs, ...$props }"
       v-on="$listeners"
@@ -18,7 +18,7 @@ import CAceEditor from './CAceEditor.vue'
 
 export default {
   components: {
-    CAceEditor
+    CAceEditor,
   },
 
   props: {
@@ -74,17 +74,17 @@ export default {
 
     suggestionParams: {
       type: Array,
-      default: []
+      default: () => [],
     },
 
     fontFamily: {
       type: String,
-      default: ""
+      default: '',
     },
 
     placeholder: {
       type: String,
-      default: ""
+      default: '',
     },
   },
 
@@ -100,12 +100,12 @@ export default {
     },
 
     autoCompleteSuggestions () {
-      return this.getRecordBasedSuggestions(this.suggestionParams);
-    }
+      return this.getRecordBasedSuggestions(this.suggestionParams)
+    },
   },
 
   methods: {
-    getRecordBasedSuggestions(params = []) {
+    getRecordBasedSuggestions (params = []) {
       const result = {}
 
       function addSuggestion (key, caption, value) {
@@ -116,15 +116,15 @@ export default {
       function processProperties (prefix, properties, interpolate) {
         (properties || []).forEach((prop) => {
           if (typeof prop === 'string') {
-            let value = prefix + '.' + prop + (interpolate ? '}' : '')
+            const value = prefix + '.' + prop + (interpolate ? '}' : '')
             addSuggestion(prefix, prop, value)
           } else {
-            let nestedPrefix = prefix + '.' + prop.value + '.'
+            const nestedPrefix = prefix + '.' + prop.value + '.'
             addSuggestion(prefix, prop.value, nestedPrefix)
 
             if (prop.properties) {
               (prop.properties || []).forEach((nestedProp) => {
-                let nestedValue = nestedPrefix + nestedProp + (interpolate ? '}' : '')
+                const nestedValue = nestedPrefix + nestedProp + (interpolate ? '}' : '')
                 addSuggestion(prefix + '.' + prop.value, nestedProp, nestedValue)
               })
             }
@@ -137,9 +137,9 @@ export default {
           addSuggestion('', '', p)
         } else {
           const { interpolate = false, properties = [], value, root = true } = p
-          let prefix = interpolate ? '${' : ''
-          let suffix = interpolate && !properties.length ? '}' : ''
-          let prefixAsValue = prefix + value + suffix + (properties.length > 0 ? '.' : '')
+          const prefix = interpolate ? '${' : ''
+          const suffix = interpolate && !properties.length ? '}' : ''
+          const prefixAsValue = prefix + value + suffix + (properties.length > 0 ? '.' : '')
 
           if (root) {
             addSuggestion('', '', prefixAsValue)
@@ -157,7 +157,7 @@ export default {
       })
 
       return result
-    }
+    },
   },
 }
 </script>
