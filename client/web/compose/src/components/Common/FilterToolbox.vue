@@ -84,6 +84,7 @@
                 value-only
                 :field="getField(filter.name)"
                 :record="filter.record"
+                @change="onValueChange"
               />
             </template>
           </b-td>
@@ -261,6 +262,10 @@ export default {
 
         this.$emit('input', value)
       }
+      this.$emit('prevent-close')
+    },
+
+    onValueChange () {
       this.$emit('prevent-close')
     },
 

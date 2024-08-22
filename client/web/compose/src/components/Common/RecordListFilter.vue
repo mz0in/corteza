@@ -220,6 +220,7 @@ export default {
     },
 
     onValueChange () {
+      console.log('prevent close')
       this.preventPopoverClose = true
 
       setTimeout(() => {
