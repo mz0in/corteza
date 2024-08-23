@@ -63,6 +63,7 @@
                   value-only
                   :field="getField(`${filter.name}-start`)"
                   :record="filter.record"
+                  @change="onValueChange"
                 />
                 <span class="my-1 text-center w-100">
                   {{ $t("general.label.and") }}
@@ -73,6 +74,7 @@
                   value-only
                   :field="getField(`${filter.name}-end`)"
                   :record="filter.record"
+                  @change="onValueChange"
                 />
               </template>
             </template>
