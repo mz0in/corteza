@@ -86,6 +86,7 @@
             <c-input-checkbox
               v-model="options.horizontalFieldLayoutEnabled"
               switch
+              :disabled="options.recordFieldLayoutOption === 'noWrap'"
               :labels="checkboxLabel"
             />
           </b-form-group>
@@ -104,6 +105,7 @@
               :options="recordFieldLayoutOptions"
               :reduce="option => option.value"
               :get-option-key="option => option.label"
+              @input="handleRecordFieldLayout"
             />
           </b-form-group>
         </b-col>
@@ -360,6 +362,12 @@ export default {
             this.referenceModule = new compose.Module({ ...module })
           })
       }
+    },
+
+    handleRecordFieldLayout (v) {
+      if (v !== 'noWrap') return
+
+      this.block.options.horizontalFieldLayoutEnabled = false
     },
   },
 }

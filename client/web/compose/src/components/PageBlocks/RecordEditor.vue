@@ -144,7 +144,7 @@ export default {
 
     fieldLayoutClass () {
       const classes = {
-        default: 'd-flex flex-column',
+        default: 'd-flex flex-column px-3',
         noWrap: 'd-flex gap-2',
         wrap: 'row no-gutters',
       }
@@ -170,7 +170,7 @@ export default {
     },
 
     horizontal () {
-      return this.block.options.horizontalFieldLayoutEnabled && this.options.recordFieldLayoutOption !== 'noWrap'
+      return this.block.options.horizontalFieldLayoutEnabled
     },
   },
 
